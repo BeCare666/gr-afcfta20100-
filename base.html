@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Visualiser un PDF en HTML</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+
+        #pdf-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        canvas {
+            border: 1px solid #ddd;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Visualiser un PDF</h2>
+
+    <!-- Input pour choisir un PDF -->
+    <input type="file" id="file-input" accept="application/pdf" />
+
+    <!-- Conteneur des pages du PDF -->
+    <div id="pdf-container"></div>
+
+    <!-- Librairie PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script>
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js";
+
+        const input = document.getElementById("file-input");
+        const container = document.getElementById("pdf-container");
+
+        input.addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (file && file.type === "application/pdf") {
+                const fileReader = new FileReader();
+                fileReader.onload = function () {
+                    const typedarray = new Uint8Array(this.result);
+
+                    pdfjsLib.getDocument(typedarray).promise.then(function (pdf) {
+                        container.innerHTML = ""; // reset
+
+                        // Parcourir toutes les pages
+                        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                            pdf.getPage(pageNum).then(function (page) {
+                                let scale = 1.2;
+                                let viewport = page.getViewport({ scale });
+
+                                let canvas = document.createElement("canvas");
+                                let context = canvas.getContext("2d");
+                                canvas.height = viewport.height;
+                                canvas.width = viewport.width;
+
+                                container.appendChild(canvas);
+
+                                page.render({ canvasContext: context, viewport });
+                            });
+                        }
+                    });
+                };
+                fileReader.readAsArrayBuffer(file);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <title>PDF en Base64</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f4f4f4;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Choisir un PDF et le convertir en Base64</h2>
+
+    <input type="file" id="file-input" accept="application/pdf" />
+    <textarea id="base64-output" placeholder="Le contenu Base64 du PDF apparaîtra ici..." readonly></textarea>
+
+    <script>
+        const input = document.getElementById("file-input");
+        const textarea = document.getElementById("base64-output");
+
+        input.addEventListener("change", function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            if (file.type !== "application/pdf") {
+                alert("Veuillez sélectionner un fichier PDF !");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function () {
+                const base64 = reader.result; // data:application/pdf;base64,...
+                console.log(base64);          // afficher dans la console
+                textarea.value = base64;      // afficher dans textarea pour copier
+            };
+            reader.readAsDataURL(file); // conversion automatique en Base64
+        });
+    </script>
+</body>
+
+</html>

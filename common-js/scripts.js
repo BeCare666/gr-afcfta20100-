@@ -21,15 +21,22 @@
     }
 
     //NORMAL TIMES COUNTDOWN
+    const translations = {
+        fr: { INDEXID7: "Heures", INDEXID8: "Minutes", INDEXID9: "Sécondes", INDEXID10: "Jours " },
+        en: { INDEXID7: "Hours", INDEXID8: "Minutes", INDEXID9: "Seconds", INDEXID10: "Days" }
+    };
 
+    /* Langue */
+    const savedLang = localStorage.getItem("selectedLang") || "fr";
+    const t = translations[savedLang];
     if (isExists('#normal-countdown')) {
         var date = $('#normal-countdown').data('date');
         $('#normal-countdown').countdown(date, function (event) {
-            var $this = $(this).html(event.strftime(''
-                + '<div class="time-sec"><h3 class="main-time">%D</h3> <span>Jours</span></div>'
-                + '<div class="time-sec"><h3 class="main-time">%H</h3> <span>heures</span></div>'
-                + '<div class="time-sec"><h3 class="main-time">%M</h3> <span>Mins</span></div>'
-                + '<div class="time-sec"><h3 class="main-time">%S</h3> <span>Sec</span></div>'));
+            $(this).html(event.strftime(''
+                + '<div class="time-sec"><h3 class="main-time">%D</h3> <span>' + t.INDEXID10 + '</span></div>'
+                + '<div class="time-sec"><h3 class="main-time">%H</h3> <span>' + t.INDEXID7 + '</span></div>'
+                + '<div class="time-sec"><h3 class="main-time">%M</h3> <span>' + t.INDEXID8 + '</span></div>'
+                + '<div class="time-sec"><h3 class="main-time">%S</h3> <span>' + t.INDEXID9 + '</span></div>'));
         });
     }
 
