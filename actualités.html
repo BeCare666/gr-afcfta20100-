@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Actualités - Front</title>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2, #6bcb77, #f9a826);
+            background-size: 400% 400%;
+            animation: gradientMove 12s ease infinite;
+        }
+
+        @keyframes gradientMove {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .card {
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.85);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .15);
+        }
+
+        /* Loader */
+        #loader {
+            position: fixed;
+            inset: 0;
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+        }
+
+        .spinner {
+            border: 6px solid #f3f3f3;
+            border-top: 6px solid #6366f1;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen p-6">
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="spinner"></div>
+    </div>
+
+    <h1 class="text-3xl font-bold text-center text-white mb-8 drop-shadow-lg">📢 Actualités</h1>
+
+    <div id="newsList" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto"></div>
+
+    <script>
+        /* --------- Firebase CONFIG --------- */
+        const firebaseConfig = {
+            apiKey: "AIzaSyCaZ2ayLosWDbF3-iu0CTr2EbvtWdGCKCk",
+            authDomain: "comming-grafcfta2100.firebaseapp.com",
+            databaseURL: "https://comming-grafcfta2100-default-rtdb.firebaseio.com",
+            projectId: "comming-grafcfta2100",
+            storageBucket: "comming-grafcfta2100.firebasestorage.app",
+            messagingSenderId: "417932287789",
+            appId: "1:417932287789:web:1385328615c9b4ca327da4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        const newsList = document.getElementById('newsList');
+        const loader = document.getElementById('loader');
+
+        /* --------- Helpers --------- */
+        const formatDate = (iso) => {
+            try {
+                const d = new Date(iso);
+                return d.toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+            } catch { return iso }
+        };
+
+        const downloadBase64 = (base64DataUrl, filename) => {
+            const a = document.createElement('a');
+            a.href = base64DataUrl;
+            a.download = filename || 'document.pdf';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        };
+
+        /* --------- Render --------- */
+        const renderNews = (items) => {
+            loader.style.display = "none"; // cacher le loader
+            newsList.innerHTML = "";
+            if (!items.length) {
+                newsList.innerHTML = `<p class="text-gray-200 text-center col-span-full">Aucune actualité disponible.</p>`;
+                return;
+            }
+
+            items.forEach(news => {
+                const likes = news.likes || 0;
+                const dislikes = news.dislikes || 0;
+
+                const card = document.createElement('div');
+                card.className = "card rounded-[5px] overflow-hidden shadow-lg flex flex-col";
+
+                card.innerHTML = `
+          ${news.image ? `<img src="${news.image}" alt="news" class="h-44 w-full object-cover">` : ""}
+          <div class="p-5 flex-1 flex flex-col">
+            <h3 class="text-lg font-bold text-gray-900">${news.title}</h3>
+            <p class="text-sm text-gray-500 mt-1">${formatDate(news.createdAt)}</p>
+            <p class="text-gray-700 mt-3 flex-1">${news.content}</p>
+
+            <div class="flex items-center justify-between mt-4">
+              <div class="flex items-center gap-4">
+                <button id="btn-like-${news.id}" class="flex items-center gap-1 text-gray-600 hover:text-indigo-600 transition" onclick="likeNews('${news.id}')">
+                  👍 <span id="like-${news.id}">${likes}</span>
+                </button>
+
+                <button id="btn-dislike-${news.id}" class="flex items-center gap-1 text-gray-600 hover:text-red-600 transition" onclick="dislikeNews('${news.id}')">
+                  👎 <span id="dislike-${news.id}">${dislikes}</span>
+                </button>
+              </div>
+
+              ${news.pdf ? `
+              <button class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition" onclick="openDownloadModal('${news.id}')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"/> </svg>
+              </button>` : `<span class="text-xs text-gray-400">Pas de PDF</span>`}
+            </div>
+          </div>
+        `;
+
+                newsList.appendChild(card);
+
+                // Bloquer si déjà voté
+                if (localStorage.getItem("voted-" + news.id)) {
+                    document.getElementById("btn-like-" + news.id).disabled = true;
+                    document.getElementById("btn-dislike-" + news.id).disabled = true;
+                    document.getElementById("btn-like-" + news.id).classList.add("opacity-50", "cursor-not-allowed");
+                    document.getElementById("btn-dislike-" + news.id).classList.add("opacity-50", "cursor-not-allowed");
+                }
+            });
+        };
+
+        /* --------- Likes --------- */
+        window.likeNews = (id) => {
+            if (localStorage.getItem("voted-" + id)) return Swal.fire("⛔", "Vous avez déjà voté !", "warning");
+            const ref = db.ref('news/' + id + '/likes');
+            ref.transaction(val => (val || 0) + 1);
+            localStorage.setItem("voted-" + id, "like");
+        };
+
+        window.dislikeNews = (id) => {
+            if (localStorage.getItem("voted-" + id)) return Swal.fire("⛔", "Vous avez déjà voté !", "warning");
+            const ref = db.ref('news/' + id + '/dislikes');
+            ref.transaction(val => (val || 0) + 1);
+            localStorage.setItem("voted-" + id, "dislike");
+        };
+
+        /* --------- Download PDF (modal email) --------- */
+        window.openDownloadModal = (id) => {
+            db.ref('news/' + id).once('value').then(snap => {
+                const data = snap.val();
+                if (!data || !data.pdf) {
+                    Swal.fire('Erreur', 'Aucun PDF trouvé', 'error');
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Téléchargement PDF',
+                    input: 'email',
+                    inputPlaceholder: 'Votre email',
+                    confirmButtonText: 'Télécharger',
+                    showCancelButton: true,
+                    inputValidator: (value) => {
+                        if (!value) return 'Email requis';
+                        const regex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+                        if (!regex.test(value)) return 'Email invalide';
+                    }
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        const email = result.value.trim().toLowerCase();
+                        const emailsList = Array.isArray(data.emails) ? data.emails.map(e => e.toLowerCase()) : [];
+
+                        // Vérifie si l'email existe déjà
+                        if (emailsList.includes(email)) {
+                            Swal.fire('⛔ Déjà téléchargé', 'Vous avez déjà téléchargé ce document', 'warning');
+                            return;
+                        }
+
+                        // 🔄 Affiche le spinner
+                        Swal.fire({
+                            title: 'Téléchargement en cours...',
+                            text: 'Veuillez patienter',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        const newsRef = db.ref('news/' + id);
+
+                        // Transaction pour incrémenter compteur + email
+                        newsRef.transaction(news => {
+                            if (news) {
+                                news.downloads = (news.downloads || 0) + 1;
+                                if (!Array.isArray(news.emails)) news.emails = [];
+                                news.emails.push(email);
+                            }
+                            return news;
+                        }, (error, committed, snapshot) => {
+                            if (error) {
+                                Swal.fire('Erreur', 'Impossible d’enregistrer votre téléchargement', 'error');
+                            }
+                            else if (committed) {
+                                // Téléchargement effectif
+                                downloadBase64(data.pdf, data.pdfName || 'document.pdf');
+                                Swal.fire('✅ Téléchargé', 'Votre PDF a été téléchargé', 'success');
+                            }
+                        });
+                    }
+                });
+            });
+        };
+
+
+        /* --------- Load data --------- */
+        const newsRef = db.ref('news').orderByChild('createdAt');
+        newsRef.on('value', (snapshot) => {
+            const val = snapshot.val() || {};
+            const arr = Object.values(val).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+            renderNews(arr);
+        });
+    </script>
+</body>
+
+</html>
