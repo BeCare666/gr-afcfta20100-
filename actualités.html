@@ -4,12 +4,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Actualités - Front</title>
+    <title id="INDEXID2XX"></title>
 
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
-
+    <script src="https://unpkg.com/i18next@22.4.10/i18next.min.js"></script>
+    <script src="https://unpkg.com/i18next-browser-languagedetector@6.1.5/i18nextBrowserLanguageDetector.min.js"></script>
+    <script src="translate.js"></script>
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -83,12 +85,11 @@
         <div class="spinner"></div>
     </div>
 
-    <h1 class="text-3xl font-bold text-center text-white mb-8 drop-shadow-lg">📢 Actualités</h1>
+    <h1 class="text-3xl font-bold text-center text-white mb-8 drop-shadow-lg" id="INDEXID2XY"> </h1>
 
     <div id="newsList" class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3 max-w-7xl mx-auto"></div>
 
     <script>
-        /* --------- Firebase CONFIG --------- */
         const firebaseConfig = {
             apiKey: "AIzaSyCaZ2ayLosWDbF3-iu0CTr2EbvtWdGCKCk",
             authDomain: "comming-grafcfta2100.firebaseapp.com",
@@ -104,14 +105,20 @@
         const newsList = document.getElementById('newsList');
         const loader = document.getElementById('loader');
 
-        /* --------- Helpers --------- */
         const formatDate = (iso) => {
             try {
                 const d = new Date(iso);
-                return d.toLocaleString('fr-FR', { dateStyle: 'medium', timeStyle: 'short' });
+                return d.toLocaleString(i18next.language === 'fr' ? 'fr-FR' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' });
             } catch { return iso }
         };
-
+            const savedLangpdf = localStorage.getItem("selectedLang") || "fr";
+            if(savedLangpdf === "fr"){
+                 document.getElementById('INDEXID2XY').innerHTML ='📢 Actualités'
+                 document.getElementById('INDEXID2XX').innerHTML ='📢 Actualités'
+            }else{
+                document.getElementById('INDEXID2XY').innerHTML ='📢 News'
+                document.getElementById('INDEXID2XX').innerHTML ='📢 News'
+            }
         const downloadBase64 = (base64DataUrl, filename) => {
             const a = document.createElement('a');
             a.href = base64DataUrl;
@@ -121,12 +128,11 @@
             a.remove();
         };
 
-        /* --------- Render --------- */
         const renderNews = (items) => {
-            loader.style.display = "none"; // cacher le loader
+            loader.style.display = "none";
             newsList.innerHTML = "";
             if (!items.length) {
-                newsList.innerHTML = `<p class="text-gray-200 text-center col-span-full">Aucune actualité disponible.</p>`;
+                newsList.innerHTML = `<p class="text-gray-200 text-center col-span-full" data-i18n="noNews">${i18next.t("noNews")}</p>`;
                 return;
             }
 
@@ -138,34 +144,35 @@
                 card.className = "card rounded-[5px] overflow-hidden shadow-lg flex flex-col";
 
                 card.innerHTML = `
-          ${news.image ? `<img src="${news.image}" alt="news" class="h-44 w-full object-cover">` : ""}
-          <div class="p-5 flex-1 flex flex-col">
-            <h3 class="text-lg font-bold text-gray-900">${news.title}</h3>
-            <p class="text-sm text-gray-500 mt-1">${formatDate(news.createdAt)}</p>
-            <p class="text-gray-700 mt-3 flex-1">${news.content}</p>
+                    ${news.image ? `<img src="${news.image}" alt="news" class="h-44 w-full object-cover">` : ""}
+                    <div class="p-5 flex-1 flex flex-col">
+                        <h3 class="text-lg font-bold text-gray-900">${news.title}</h3>
+                        <p class="text-sm text-gray-500 mt-1">${formatDate(news.createdAt)}</p>
+                        <p class="text-gray-700 mt-3 flex-1">${news.content}</p>
 
-            <div class="flex items-center justify-between mt-4">
-              <div class="flex items-center gap-4">
-                <button id="btn-like-${news.id}" class="flex items-center gap-1 text-gray-600 hover:text-indigo-600 transition" onclick="likeNews('${news.id}')">
-                  👍 <span id="like-${news.id}">${likes}</span>
-                </button>
+                        <div class="flex items-center justify-between mt-4">
+                            <div class="flex items-center gap-4">
+                                <button id="btn-like-${news.id}" class="flex items-center gap-1 text-gray-600 hover:text-indigo-600 transition" onclick="likeNews('${news.id}')">
+                                  👍 <span id="like-${news.id}">${likes}</span>
+                                </button>
+                                <button id="btn-dislike-${news.id}" class="flex items-center gap-1 text-gray-600 hover:text-red-600 transition" onclick="dislikeNews('${news.id}')">
+                                  👎 <span id="dislike-${news.id}">${dislikes}</span>
+                                </button>
+                            </div>
 
-                <button id="btn-dislike-${news.id}" class="flex items-center gap-1 text-gray-600 hover:text-red-600 transition" onclick="dislikeNews('${news.id}')">
-                  👎 <span id="dislike-${news.id}">${dislikes}</span>
-                </button>
-              </div>
-
-              ${news.pdf ? `
-              <button class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition" onclick="openDownloadModal('${news.id}')">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"/> </svg>
-              </button>` : `<span class="text-xs text-gray-400">Pas de PDF</span>`}
-            </div>
-          </div>
-        `;
+                            ${news.pdf ? `
+                                <button class="p-2 rounded-lg bg-indigo-50 hover:bg-indigo-100 transition" onclick="openDownloadModal('${news.id}')">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"/>
+                                    </svg>
+                                </button>`
+                        : `<span class="text-xs text-gray-400" data-i18n="noPdf">${i18next.t("noPdf")}</span>`}
+                        </div>
+                    </div>
+                `;
 
                 newsList.appendChild(card);
 
-                // Bloquer si déjà voté
                 if (localStorage.getItem("voted-" + news.id)) {
                     document.getElementById("btn-like-" + news.id).disabled = true;
                     document.getElementById("btn-dislike-" + news.id).disabled = true;
@@ -175,56 +182,52 @@
             });
         };
 
-        /* --------- Likes --------- */
         window.likeNews = (id) => {
-            if (localStorage.getItem("voted-" + id)) return Swal.fire("⛔", "Vous avez déjà voté !", "warning");
+            if (localStorage.getItem("voted-" + id)) return Swal.fire(i18next.t("alreadyVoted"));
             const ref = db.ref('news/' + id + '/likes');
             ref.transaction(val => (val || 0) + 1);
             localStorage.setItem("voted-" + id, "like");
         };
 
         window.dislikeNews = (id) => {
-            if (localStorage.getItem("voted-" + id)) return Swal.fire("⛔", "Vous avez déjà voté !", "warning");
+            if (localStorage.getItem("voted-" + id)) return Swal.fire(i18next.t("alreadyVoted"));
             const ref = db.ref('news/' + id + '/dislikes');
             ref.transaction(val => (val || 0) + 1);
             localStorage.setItem("voted-" + id, "dislike");
         };
 
-        /* --------- Download PDF (modal email) --------- */
         window.openDownloadModal = (id) => {
             db.ref('news/' + id).once('value').then(snap => {
                 const data = snap.val();
                 if (!data || !data.pdf) {
-                    Swal.fire('Erreur', 'Aucun PDF trouvé', 'error');
+                    Swal.fire(i18next.t("error"), i18next.t("noPdf"), 'error');
                     return;
                 }
 
                 Swal.fire({
-                    title: 'Téléchargement PDF',
+                    title: i18next.t("downloadPdf"),
                     input: 'email',
-                    inputPlaceholder: 'Votre email',
-                    confirmButtonText: 'Télécharger',
+                    inputPlaceholder: 'Email',
+                    confirmButtonText: i18next.t("downloadPdf"),
                     showCancelButton: true,
                     inputValidator: (value) => {
-                        if (!value) return 'Email requis';
+                        if (!value) return i18next.t("emailRequired");
                         const regex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-                        if (!regex.test(value)) return 'Email invalide';
+                        if (!regex.test(value)) return i18next.t("emailInvalid");
                     }
                 }).then(result => {
                     if (result.isConfirmed) {
                         const email = result.value.trim().toLowerCase();
                         const emailsList = Array.isArray(data.emails) ? data.emails.map(e => e.toLowerCase()) : [];
 
-                        // Vérifie si l'email existe déjà
                         if (emailsList.includes(email)) {
-                            Swal.fire('⛔ Déjà téléchargé', 'Vous avez déjà téléchargé ce document', 'warning');
+                            Swal.fire('⛔', i18next.t("alreadyDownloaded"), 'warning');
                             return;
                         }
 
-                        // 🔄 Affiche le spinner
                         Swal.fire({
-                            title: 'Téléchargement en cours...',
-                            text: 'Veuillez patienter',
+                            title: i18next.t("downloading"),
+                            text: '',
                             allowOutsideClick: false,
                             didOpen: () => {
                                 Swal.showLoading();
@@ -232,8 +235,6 @@
                         });
 
                         const newsRef = db.ref('news/' + id);
-
-                        // Transaction pour incrémenter compteur + email
                         newsRef.transaction(news => {
                             if (news) {
                                 news.downloads = (news.downloads || 0) + 1;
@@ -243,12 +244,11 @@
                             return news;
                         }, (error, committed, snapshot) => {
                             if (error) {
-                                Swal.fire('Erreur', 'Impossible d’enregistrer votre téléchargement', 'error');
+                                Swal.fire(i18next.t("error"), i18next.t("error"), 'error');
                             }
                             else if (committed) {
-                                // Téléchargement effectif
                                 downloadBase64(data.pdf, data.pdfName || 'document.pdf');
-                                Swal.fire('✅ Téléchargé', 'Votre PDF a été téléchargé', 'success');
+                                Swal.fire('✅', i18next.t("downloaded"), 'success');
                             }
                         });
                     }
@@ -256,15 +256,13 @@
             });
         };
 
-
-        /* --------- Load data --------- */
         const newsRef = db.ref('news').orderByChild('createdAt');
         newsRef.on('value', (snapshot) => {
             const val = snapshot.val() || {};
             const arr = Object.values(val).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
             renderNews(arr);
         });
-    </script>
+    </script>  
 </body>
 
 </html>
