@@ -339,7 +339,8 @@
             });
         };
         window.copyPDFUrl = id => {
-            const url = `${window.location.origin}admin/download.html?id=${id}`;
+            const origin = "https://gr-afcfta2100.org"
+            const url = `${origin}/infosdownload.html?id=${id}`;
             navigator.clipboard.writeText(url)
                 .then(() => Swal.fire('✅ Copié', 'Le lien de téléchargement a été copié', 'success'))
                 .catch(() => Swal.fire('Erreur', 'Impossible de copier', 'error'));
