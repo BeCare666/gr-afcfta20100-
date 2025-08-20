@@ -1,0 +1,14 @@
+{
+    "download": {
+        "title": "Program Download",
+        "name": "Your name",
+        "email": "Your email",
+        "errorFields": "Please fill in all fields",
+        "accessDeniedTitle": "Access denied",
+        "accessDeniedMsg": "This email has already downloaded the document.",
+        "loadingTitle": "Downloading...",
+        "loadingText": "Please wait",
+        "successTitle": "Congratulations 🎉",
+        "successText": "Your download has started successfully!"
+    }
+}

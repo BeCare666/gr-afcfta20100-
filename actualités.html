@@ -10,7 +10,8 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <script src="https://unpkg.com/i18next@22.4.10/i18next.min.js"></script>
-    <script src="https://unpkg.com/i18next-browser-languagedetector@6.1.5/i18nextBrowserLanguageDetector.min.js"></script>
+    <script
+        src="https://unpkg.com/i18next-browser-languagedetector@6.1.5/i18nextBrowserLanguageDetector.min.js"></script>
     <script src="translate.js"></script>
     <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -111,14 +112,14 @@
                 return d.toLocaleString(i18next.language === 'fr' ? 'fr-FR' : 'en-US', { dateStyle: 'medium', timeStyle: 'short' });
             } catch { return iso }
         };
-            const savedLangpdf = localStorage.getItem("selectedLang") || "fr";
-            if(savedLangpdf === "fr"){
-                 document.getElementById('INDEXID2XY').innerHTML ='📢 Actualités'
-                 document.getElementById('INDEXID2XX').innerHTML ='📢 Actualités'
-            }else{
-                document.getElementById('INDEXID2XY').innerHTML ='📢 News'
-                document.getElementById('INDEXID2XX').innerHTML ='📢 News'
-            }
+        const savedLangpdf = localStorage.getItem("selectedLang") || "fr";
+        if (savedLangpdf === "fr") {
+            document.getElementById('INDEXID2XY').innerHTML = '📢 Actualités'
+            document.getElementById('INDEXID2XX').innerHTML = '📢 Actualités'
+        } else {
+            document.getElementById('INDEXID2XY').innerHTML = '📢 News'
+            document.getElementById('INDEXID2XX').innerHTML = '📢 News'
+        }
         const downloadBase64 = (base64DataUrl, filename) => {
             const a = document.createElement('a');
             a.href = base64DataUrl;
@@ -167,6 +168,12 @@
                                     </svg>
                                 </button>`
                         : `<span class="text-xs text-gray-400" data-i18n="noPdf">${i18next.t("noPdf")}</span>`}
+                         <button class="p-2 bg-green-100 rounded-lg hover:bg-green-200 transition" title="Copier URL PDF"
+                            onclick='copyPDFUrl("${news.id}")'>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16h8m-8-4h8m-8-4h8M4 20h16V4H4v16z" />
+                            </svg>
+                        </button>
                         </div>
                     </div>
                 `;
@@ -188,7 +195,24 @@
             ref.transaction(val => (val || 0) + 1);
             localStorage.setItem("voted-" + id, "like");
         };
-
+        window.copyPDFUrl = id => {
+            const url = `${window.location.origin}/download.html?id=${id}`;
+            navigator.clipboard.writeText(url)
+                .then(() => Swal.fire({
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1200,  // se ferme automatiquement
+                    toast: true,
+                    position: 'top-end'
+                }))
+                .catch(() => Swal.fire({
+                    icon: 'error',
+                    showConfirmButton: false,
+                    timer: 1200,
+                    toast: true,
+                    position: 'top-end'
+                }));
+        };
         window.dislikeNews = (id) => {
             if (localStorage.getItem("voted-" + id)) return Swal.fire(i18next.t("alreadyVoted"));
             const ref = db.ref('news/' + id + '/dislikes');
@@ -262,7 +286,7 @@
             const arr = Object.values(val).sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
             renderNews(arr);
         });
-    </script>  
+    </script>
 </body>
 
 </html>

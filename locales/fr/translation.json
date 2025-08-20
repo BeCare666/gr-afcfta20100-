@@ -1,0 +1,14 @@
+{
+    "download": {
+        "title": "Téléchargement du programme",
+        "name": "Votre nom",
+        "email": "Votre email",
+        "errorFields": "Merci de remplir tous les champs",
+        "accessDeniedTitle": "Accès refusé",
+        "accessDeniedMsg": "Cet email a déjà téléchargé le document.",
+        "loadingTitle": "Téléchargement en cours...",
+        "loadingText": "Merci de patienter",
+        "successTitle": "Félicitations 🎉",
+        "successText": "Votre téléchargement a démarré avec succès !"
+    }
+}
