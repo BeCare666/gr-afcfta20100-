@@ -1,61 +1,6 @@
+
 document.addEventListener("DOMContentLoaded", () => {
-    // Ouvrir modal au clic
-    document.getElementById("openLangModalBtn").addEventListener("click", () => {
-        document.getElementById("langModal").style.display = "flex";
-        document.getElementById("INDEXID5").innerHTML = i18next.t("INDEXID5");
-        document.getElementById("INDEXID6").innerHTML = i18next.t("INDEXID6");
-    });
 
-    // Fermer modal au clic sur la croix
-    document.getElementById("closeLangModalBtn").addEventListener("click", () => {
-        document.getElementById("langModal").style.display = "none";
-    });
-
-    // Fermer modal si clic en dehors de la boite blanche
-    document.getElementById("langModal").addEventListener("click", (e) => {
-        if (e.target === document.getElementById("langModal")) {
-            document.getElementById("langModal").style.display = "none";
-        }
-    });
-
-    // Changement de langue
-    document.addEventListener("DOMContentLoaded", () => {
-        let savedLang = localStorage.getItem("selectedLang") || "fr"; // fr par défaut
-
-        const langFlags = {
-            fr: "https://flagcdn.com/w40/fr.png",
-            en: "https://flagcdn.com/w40/gb.png",
-        };
-
-        i18next.changeLanguage(savedLang, () => {
-            updateContent();
-            document.getElementById("currentFlag").src = langFlags[savedLang];
-        });
-    });
-
-    document.querySelectorAll(".langOption").forEach(option => {
-        option.addEventListener("click", function () {
-            let lang = this.getAttribute("data-lang");
-            let imgSrc = this.querySelector("img").src;
-
-            localStorage.setItem("selectedLang", lang);
-            document.getElementById("langModal").style.display = "none";
-            location.reload();
-            i18next.changeLanguage(lang, () => {
-                updateContent();
-                document.getElementById("langModal").style.display = "none";
-            });
-
-            document.getElementById("currentFlag").src = imgSrc;
-
-        });
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-        setTimeout(() => {
-            // document.getElementById("loading").style.display = "none"
-        }, 7000);
-    });
     const resources = {
         en: {
             translation: {
@@ -207,6 +152,62 @@ document.addEventListener("DOMContentLoaded", () => {
 
     }
 
+    // Ouvrir modal au clic
+    document.getElementById("openLangModalBtn").addEventListener("click", () => {
+        document.getElementById("langModal").style.display = "flex";
+        document.getElementById("INDEXID5").innerHTML = i18next.t("INDEXID5");
+        document.getElementById("INDEXID6").innerHTML = i18next.t("INDEXID6");
+    });
 
+    // Fermer modal au clic sur la croix
+    document.getElementById("closeLangModalBtn").addEventListener("click", () => {
+        document.getElementById("langModal").style.display = "none";
+    });
+
+    // Fermer modal si clic en dehors de la boite blanche
+    document.getElementById("langModal").addEventListener("click", (e) => {
+        if (e.target === document.getElementById("langModal")) {
+            document.getElementById("langModal").style.display = "none";
+        }
+    });
+
+    // Changement de langue
+    document.addEventListener("DOMContentLoaded", () => {
+        let savedLang = localStorage.getItem("selectedLang") || "fr"; // fr par défaut
+
+        const langFlags = {
+            fr: "https://flagcdn.com/w40/fr.png",
+            en: "https://flagcdn.com/w40/gb.png",
+        };
+
+        i18next.changeLanguage(savedLang, () => {
+            updateContent();
+            document.getElementById("currentFlag").src = langFlags[savedLang];
+        });
+    });
+
+    document.querySelectorAll(".langOption").forEach(option => {
+        option.addEventListener("click", function () {
+            let lang = this.getAttribute("data-lang");
+            let imgSrc = this.querySelector("img").src;
+
+            localStorage.setItem("selectedLang", lang);
+            document.getElementById("langModal").style.display = "none";
+            location.reload();
+            i18next.changeLanguage(lang, () => {
+                updateContent();
+                document.getElementById("langModal").style.display = "none";
+            });
+
+            document.getElementById("currentFlag").src = imgSrc;
+
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        setTimeout(() => {
+            // document.getElementById("loading").style.display = "none"
+        }, 7000);
+    });
 
 });
