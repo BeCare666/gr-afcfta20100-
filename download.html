@@ -58,10 +58,11 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-
+        const params = new URLSearchParams(window.location.search);
+        const savedLangpdf = params.get("lang") || "fr";
         // Init i18next avec resources intégrées
         i18next.init({
-            lng: "en", // Langue par défaut
+            lng: savedLangpdf, // Langue par défaut
             resources: {
                 en: {
                     translation: {
