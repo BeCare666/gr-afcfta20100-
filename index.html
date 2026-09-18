@@ -1,81 +1,369 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
     <title>Growth Routes AfCFTA 2100</title>
 
     <link rel="stylesheet" href="style.css">
+
+    <style>
+        /* ============================
+       BOUTON ACTUALITÉS PREMIUM
+    ================================= */
+
+        .news-button-wrapper {
+            position: fixed;
+            left: 50%;
+            bottom: 25%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            width: max-content;
+            max-width: calc(100% - 40px);
+        }
+
+        .news-button {
+            position: relative;
+
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+
+            min-width: 210px;
+            padding: 15px 28px;
+
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 999px;
+
+            background:
+                linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.16),
+                    rgba(255, 255, 255, 0.06));
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            color: #ffffff;
+
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+
+            text-decoration: none;
+
+            box-shadow:
+                0 12px 35px rgba(0, 0, 0, 0.25),
+                inset 0 1px 0 rgba(255, 255, 255, 0.18);
+
+            overflow: hidden;
+
+            cursor: pointer;
+
+            transition:
+                transform 0.35s ease,
+                box-shadow 0.35s ease,
+                border-color 0.35s ease,
+                background 0.35s ease;
+        }
+
+        /* Lumière qui traverse le bouton */
+        .news-button::before {
+            content: "";
+
+            position: absolute;
+            top: 0;
+            left: -120%;
+
+            width: 70%;
+            height: 100%;
+
+            background: linear-gradient(90deg,
+                    transparent,
+                    rgba(255, 255, 255, 0.28),
+                    transparent);
+
+            transform: skewX(-20deg);
+
+            transition: left 0.7s ease;
+        }
+
+        /* Halo */
+        .news-button::after {
+            content: "";
+
+            position: absolute;
+            inset: -2px;
+
+            border-radius: inherit;
+
+            background: linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.35),
+                    transparent 45%,
+                    rgba(255, 255, 255, 0.15));
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            transition: opacity 0.35s ease;
+        }
+
+        .news-button:hover {
+            transform: translateY(-4px);
+
+            background:
+                linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.22),
+                    rgba(255, 255, 255, 0.08));
+
+            border-color: rgba(255, 255, 255, 0.45);
+
+            box-shadow:
+                0 18px 45px rgba(0, 0, 0, 0.32),
+                0 0 35px rgba(255, 255, 255, 0.12),
+                inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        }
+
+        .news-button:hover::before {
+            left: 140%;
+        }
+
+        .news-button:hover::after {
+            opacity: 1;
+        }
+
+        .news-button:active {
+            transform: translateY(-1px) scale(0.98);
+        }
+
+        /* Icône */
+        .news-icon {
+            position: relative;
+            z-index: 2;
+
+            width: 22px;
+            height: 22px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+        }
+
+        .news-icon svg {
+            width: 100%;
+            height: 100%;
+
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.8;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .news-text {
+            position: relative;
+            z-index: 2;
+            white-space: nowrap;
+        }
+
+        .news-arrow {
+            position: relative;
+            z-index: 2;
+
+            display: flex;
+            align-items: center;
+
+            font-size: 18px;
+
+            transition: transform 0.35s ease;
+        }
+
+        .news-button:hover .news-arrow {
+            transform: translateX(4px);
+        }
+
+        /* ================================
+       RESPONSIVE
+    ================================= */
+
+        @media (max-width: 600px) {
+
+            .news-button-wrapper {
+                bottom: 20%;
+                max-width: calc(100% - 30px);
+            }
+
+            .news-button {
+                min-width: 0;
+                width: auto;
+
+                padding: 13px 21px;
+
+                gap: 9px;
+
+                font-size: 14px;
+            }
+
+            .news-icon {
+                width: 19px;
+                height: 19px;
+            }
+
+            .news-arrow {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 360px) {
+
+            .news-button {
+                padding: 12px 17px;
+                font-size: 13px;
+            }
+
+            .news-button-wrapper {
+                bottom: 20%;
+            }
+        }
+
+        /* Respecte les utilisateurs qui réduisent les animations */
+        @media (prefers-reduced-motion: reduce) {
+
+            .news-button,
+            .news-button::before,
+            .news-button::after,
+            .news-arrow {
+                transition: none;
+            }
+        }
+    </style>
+    ```
+
 </head>
 
 <body>
+
+    ```
+    <!-- =================================
+     ARRIÈRE-PLAN
+================================== -->
 
     <div class="background">
         <img src="loading.png" alt="">
     </div>
 
+
+    <!-- =================================
+     PARTICULES
+================================== -->
+
     <div class="particles" id="particles"></div>
 
-</body>
-<script>
-    const container = document.getElementById("particles");
 
-    // Bulles
-    for (let i = 0; i < 35; i++) {
+    <!-- =================================
+     BOUTON ACTUALITÉS
+================================== -->
 
-        const bubble = document.createElement("div");
+    <div class="news-button-wrapper">
 
-        bubble.className = "bubble";
+        <a href="actualités.html" class="news-button" aria-label="Accéder aux actualités">
 
-        const size = Math.random() * 40 + 8;
+            <span class="news-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16.5A1.5 1.5 0 0 1 18.5 21H6a3 3 0 0 1-3-3V6.5A1.5 1.5 0 0 1 4.5 5H20">
+                    </path>
+                    <path d="M7 7h9"></path>
+                    <path d="M7 11h9"></path>
+                    <path d="M7 15h6"></path>
+                </svg>
+            </span>
 
-        bubble.style.width = size + "px";
-        bubble.style.height = size + "px";
+            <span class="news-text">
+                Actualités
+            </span>
 
-        bubble.style.left = Math.random() * 100 + "%";
+            <span class="news-arrow" aria-hidden="true">
+                →
+            </span>
 
-        bubble.style.animationDuration = (10 + Math.random() * 12) + "s";
+        </a>
 
-        bubble.style.animationDelay = Math.random() * 15 + "s";
+    </div>
 
-        container.appendChild(bubble);
 
-    }
+    <!-- =================================
+     JAVASCRIPT PARTICULES
+================================== -->
 
-    // Etoiles
-    for (let i = 0; i < 120; i++) {
+    <script>
+        const container = document.getElementById("particles");
 
-        const star = document.createElement("div");
+        // Bulles
+        for (let i = 0; i < 35; i++) {
 
-        star.className = "star";
+            const bubble = document.createElement("div");
 
-        const size = Math.random() * 40 + 8;
+            bubble.className = "bubble";
 
-        bubble.style.width = size + "px";
-        bubble.style.height = size + "px";
+            const size = Math.random() * 40 + 8;
 
-        bubble.style.left = Math.random() * 100 + "%";
+            bubble.style.width = size + "px";
+            bubble.style.height = size + "px";
 
-        // Les petites bulles montent plus lentement
-        let duration;
+            bubble.style.left = Math.random() * 100 + "%";
 
-        if (size <= 1) {
-            duration = 45 + Math.random() * 20; // 45 à 65 secondes
-        } else if (size <= 30) {
-            duration = 30 + Math.random() * 15; // 30 à 45 secondes
-        } else {
-            duration = 20 + Math.random() * 10; // 20 à 30 secondes
+            bubble.style.animationDuration = (10 + Math.random() * 12) + "s";
+
+            bubble.style.animationDelay = Math.random() * 15 + "s";
+
+            container.appendChild(bubble);
+
         }
 
-        bubble.style.animationDuration = duration + "s";
+        // Etoiles
+        for (let i = 0; i < 120; i++) {
 
-        // Départ aléatoire
-        bubble.style.animationDelay = Math.random() * duration + "s";
+            const star = document.createElement("div");
 
-        container.appendChild(star);
+            star.className = "star";
 
-    }
-</script>
+            const size = Math.random() * 40 + 8;
+
+            bubble.style.width = size + "px";
+            bubble.style.height = size + "px";
+
+            bubble.style.left = Math.random() * 100 + "%";
+
+            // Les petites bulles montent plus lentement
+            let duration;
+
+            if (size <= 1) {
+                duration = 45 + Math.random() * 20; // 45 à 65 secondes
+            } else if (size <= 30) {
+                duration = 30 + Math.random() * 15; // 30 à 45 secondes
+            } else {
+                duration = 20 + Math.random() * 10; // 20 à 30 secondes
+            }
+
+            bubble.style.animationDuration = duration + "s";
+
+            // Départ aléatoire
+            bubble.style.animationDelay = Math.random() * duration + "s";
+
+            container.appendChild(star);
+
+        }
+    </script>
+
+</body>
 
 </html>
